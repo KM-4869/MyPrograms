@@ -150,6 +150,26 @@ Matrix operator*(const double C, const Matrix& m)
 	return mulM;
 }
 
+Matrix Matrix::SubMatrix(int topleft_row, int topleft_col, int submatrixrow, int submatrixcol)const
+{
+	Matrix SubM(submatrixrow, submatrixcol);
+
+	if (topleft_row + submatrixrow - 1 > MatrixRows || topleft_col + submatrixcol - 1 > MatrixCols)
+	{
+		printf("The SubMatrix is out of the original matrix\n");
+		return SubM;
+	}
+
+	for (int i = 0; i < submatrixrow; i++)
+		for (int j = 0; j < submatrixcol; j++)
+		{
+			SubM.M[i * submatrixcol + j] = M[(i + topleft_row - 1) * MatrixCols + (j + topleft_col - 1)];
+		}
+
+	return SubM;
+}
+
+
 Matrix operator*(const Matrix& m, const double C)
 {
 	Matrix mulM(m.MatrixRows, m.MatrixCols);
@@ -233,6 +253,12 @@ Matrix Matrix::A()const
 		printf("Only square matrices can find the adjugate matrix\n");
 		return A;
 	}
+	//一个元素的伴随矩阵为1
+	if (MatrixRows == 1)
+	{
+		A.M[0] = 1.0;
+		return A;
+	}
 
 	//遍历矩阵中的每个元素，求出它们的余子式数组
 	for (int ROW = 0; ROW < MatrixRows; ROW++)
@@ -306,6 +332,15 @@ void Matrix::ToE(int n)
 	}
 }
 
+void Matrix::ToZero()
+{
+	for (int i = 0; i < MatrixRows * MatrixCols; i++)
+	{
+		M[i] = 0.0;
+	}
+	return;
+}
+
 void Matrix::Show()const
 {
 	for (int i = 0; i < MatrixRows; i++)
@@ -316,6 +351,7 @@ void Matrix::Show()const
 		}
 		printf("\n");
 	}
+	printf("\n");
 }
 
 int Matrix::getrow()const
@@ -380,4 +416,59 @@ Matrix RotationMatrix(double x_angle, double y_angle, double z_angle, int order)
 		return X;
 		break;
 	}
+}
+
+Matrix Matrix::operator,(const Matrix& m)const
+{
+	Matrix BigM(MatrixRows, MatrixCols + m.MatrixCols);
+
+	if (MatrixRows != m.MatrixRows)
+	{
+		printf("The number of rows in matrix subtraction is inconsistent\n");
+		return BigM;
+	}
+
+	for (int i = 0; i < BigM.MatrixRows; i++)
+		for (int j = 0; j < BigM.MatrixCols; j++)
+		{
+			if (j <= MatrixCols - 1)
+			{
+				BigM.M[i * BigM.MatrixCols + j] = M[i * MatrixCols + j];
+			}
+			else
+			{
+				BigM.M[i * BigM.MatrixCols + j] = m.M[i * m.MatrixCols + j - MatrixCols];
+			}
+		}
+
+	return BigM;
+
+}
+
+
+Matrix Matrix::operator&(const Matrix& m)const
+{
+	Matrix BigM(MatrixRows + m.MatrixRows, MatrixCols);
+
+	if (MatrixCols != m.MatrixCols)
+	{
+		printf("The number of cols in matrix subtraction is inconsistent\n");
+		return BigM;
+	}
+
+	for (int i = 0; i < BigM.MatrixRows; i++)
+		for (int j = 0; j < BigM.MatrixCols; j++)
+		{
+			if (i <= MatrixRows - 1)
+			{
+				BigM.M[i * BigM.MatrixCols + j] = M[i * MatrixCols + j];
+			}
+			else
+			{
+				BigM.M[i * BigM.MatrixCols + j] = m.M[i * m.MatrixCols + j - MatrixCols * MatrixRows];
+			}
+		}
+
+	return BigM;
+
 }

@@ -21,6 +21,9 @@ public:
 	Matrix operator+(const Matrix& m)const;//矩阵加法
 	Matrix operator-(const Matrix& m)const;//矩阵减法
 	Matrix operator*(const Matrix& m)const;//矩阵乘法
+	Matrix operator,(const Matrix& m)const;//两个矩阵进行左右合并
+	Matrix operator&(const Matrix& m)const;//两个矩阵进行上下合并
+	Matrix SubMatrix(int topleft_row, int topleft_col, int submatrixrow, int submatrixcol)const;//取子矩阵
 	friend Matrix operator*(const double C,const Matrix&m);//矩阵数乘
 	friend Matrix operator*(const Matrix& m, const double C);//矩阵数乘
 	Matrix T()const;//矩阵转置
@@ -28,6 +31,7 @@ public:
 	Matrix A()const;//伴随矩阵
 	Matrix inv()const;//矩阵求逆
 	void ToE(int n);//将矩阵变为n维单位阵
+	void ToZero();//把一个矩阵全部清零
 	void Show()const;
 
 	int getrow()const;
@@ -35,7 +39,6 @@ public:
 	int getsize()const;
 	double getelement(int row,int col)const;
 
-	friend Matrix AntiSymMatrix(Vector &v);//向量的反对称矩阵
 
 /*******************************************************************************
 在三维空间内输入三个旋转角 和矩阵排列顺序，得到一个旋转矩阵。order由1-12分别对应
