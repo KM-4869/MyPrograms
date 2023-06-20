@@ -3,6 +3,7 @@
 FileLoader::FileLoader(const string& filename, int datacount, int filetype)
 {
 	open(filename, datacount, filetype);
+	OneLineData.resize(DataCount);
 }
 
 bool FileLoader::open(const string& filename, int datacount, int filetype)
@@ -33,7 +34,8 @@ bool FileLoader::load(vector<double>& onelinedata)
 {
 	if (load_())
 	{
-		onelinedata = std::move(OneLineData);
+		//onelinedata = std::move(OneLineData);
+		std::copy(OneLineData.begin(), OneLineData.end(), onelinedata.begin());
 		return true;
 	}
 
@@ -46,7 +48,7 @@ bool FileLoader::load_()
 	if (fin.eof())
 		return false;
 
-	OneLineData.resize(DataCount);
+
 	//读文本文件
 	if (FileType == TEXT)
 	{
@@ -60,10 +62,12 @@ bool FileLoader::load_()
 	
 		vector<string> split_line = StrSplit(line, 2, d1, d2);
 		//清空历史数据
-		OneLineData.clear();
+		//OneLineData.clear();
 		//获取新数据
-		  for (auto i : split_line)
-		  	OneLineData.push_back(stod(i));
+		// for (auto i : split_line)
+		// OneLineData.push_back(stod(i));
+		for (int i = 0; i < DataCount; i++)
+			OneLineData[i] = stod(split_line[i]);
 
 	}
 	else if (FileType == BINARY)

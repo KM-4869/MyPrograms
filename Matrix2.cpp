@@ -150,6 +150,16 @@ Matrix operator*(const double C, const Matrix& m)
 	return mulM;
 }
 
+Matrix operator*(const Matrix& m, const double C)
+{
+	Matrix mulM(m.MatrixRows, m.MatrixCols);
+
+	for (int i = 0; i < m.MatrixRows * m.MatrixCols; i++)
+		mulM.M[i] = C * m.M[i];
+
+	return mulM;
+}
+
 Matrix Matrix::SubMatrix(int topleft_row, int topleft_col, int submatrixrow, int submatrixcol)const
 {
 	Matrix SubM(submatrixrow, submatrixcol);
@@ -167,17 +177,6 @@ Matrix Matrix::SubMatrix(int topleft_row, int topleft_col, int submatrixrow, int
 		}
 
 	return SubM;
-}
-
-
-Matrix operator*(const Matrix& m, const double C)
-{
-	Matrix mulM(m.MatrixRows, m.MatrixCols);
-
-	for (int i = 0; i < m.MatrixRows * m.MatrixCols; i++)
-		mulM.M[i] = C * m.M[i];
-
-	return mulM;
 }
 
 Matrix Matrix::T()const
@@ -312,6 +311,63 @@ Matrix Matrix::inv()const
 	return invM;
 }
 
+Matrix Matrix::inv2()const
+{
+	if (MatrixRows != MatrixCols)
+	{
+		printf("Only square matrices can find the inverse matrix\n");
+		return *this;
+	}
+
+	//创造一个同维数单位阵
+	Matrix I(MatrixRows, MatrixCols);
+	I.ToE(MatrixRows);
+
+	//创建一此矩阵的复制矩阵，以此为基础进行行变换，而原矩阵内部元素不变
+	Matrix T = *this;
+
+	for (int i = 0; i < T.MatrixRows; i++)
+	{
+		int j;
+		for ( j = i; j < T.MatrixRows; j++)
+		{	//大于此阈值判断为第j行i列元素不为0
+			if (fabs(T.M[j * MatrixCols + i]) > 10E-12)
+			{
+				break;
+			}
+		}
+		//没能找到同列非0元素，高斯消元必有自由未知量，方程多解，行列式为0，不可求逆
+		if (j == T.MatrixRows)
+		{
+			printf("You can't invert the matrix\n");
+			return *this;
+		}
+		//说明第i行i列的元素为0，无法直接变换，需要和找到的第j行i列不为0的元素，并使i行与j行调换
+		if (j != i)
+		{
+			I.ExChangeT((i + 1), (j + 1));
+			T.ExChangeT((i + 1), (j + 1));
+		}
+		//将i行i列元素化为1
+		I.MulT((i + 1), (1.0 / T.M[i * MatrixCols + i]));
+		T.MulT((i + 1), (1.0 / T.M[i * MatrixCols + i]));
+
+		//此时i行i列元素不为0，对其他行进行消除变换
+		for (int k = 0; k < MatrixRows; k++)
+		{
+			if (k == i)
+				continue;
+
+			I.AddT((i + 1), -T.M[k * MatrixCols + i], (k + 1));
+			T.AddT((i + 1), -T.M[k * MatrixCols + i], (k + 1));
+
+		}
+
+	}
+
+	return I;
+}
+
 void Matrix::ToE(int n)
 {
 	//将原本的矩阵删掉
@@ -345,6 +401,7 @@ void Matrix::Show()const
 {
 	for (int i = 0; i < MatrixRows; i++)
 	{
+		printf("第%d行:  ", i + 1);
 		for (int j = 0; j < MatrixCols; j++)
 		{
 			printf("%15.6f", M[i * MatrixCols + j]);
@@ -373,7 +430,7 @@ double Matrix::getelement(int row, int col)const
 {
 	if (row > MatrixRows || col > MatrixCols|| row < 1 || col < 1 )
 	{
-		printf("The index is over the Matrix size");
+		printf("The index is over the Matrix size\n");
 		return -1;
 	}
 
@@ -471,4 +528,79 @@ Matrix Matrix::operator&(const Matrix& m)const
 
 	return BigM;
 
+}
+
+void Matrix::MulT(int row, double c)
+{
+	if (row > MatrixRows)
+	{
+		printf("The index is out of Matrix's row\n");
+		return;
+	}
+
+	for (int i = 0; i < MatrixCols; i++)
+	{
+		M[(row - 1) * MatrixCols + i] *= c;
+	}
+
+}
+
+void Matrix::AddT(int irow, double c, int jrow)
+{
+	if (irow > MatrixRows|| jrow > MatrixRows)
+	{
+		printf("The index is out of Matrix's row\n");
+		return;
+	}
+
+	for (int i = 0; i < MatrixCols; i++)
+	{
+		M[(jrow - 1) * MatrixCols + i] += M[(irow - 1) * MatrixCols + i] * c;
+	}
+
+}
+
+void Matrix::ExChangeT(int irow, int jrow)
+{
+	if (irow > MatrixRows || jrow > MatrixRows)
+	{
+		printf("The index is out of Matrix's row\n");
+		return;
+	}
+
+	for (int i = 0; i < MatrixCols; i++)
+	{
+		double t;
+		t = M[(irow - 1) * MatrixCols + i];
+		M[(irow - 1) * MatrixCols + i] = M[(jrow - 1) * MatrixCols + i];
+		M[(jrow - 1) * MatrixCols + i] = t;
+	}
+
+}
+
+void Matrix::RandomMatrix(double min, double max)
+{
+	std::default_random_engine e;//随机数引擎
+
+	std::uniform_real_distribution<double> u(min, max);//控制随机数引擎生成min到max平均分布的实数
+
+	e.seed(time(0));
+
+	for (int i = 0; i < MatrixRows; i++)
+		for (int j = 0; j < MatrixCols; j++)
+		{
+			M[i * MatrixCols + j] = u(e);
+		}
+}
+
+double* Matrix::getdata()const
+{
+	double* CopyM = new double[MatrixRows * MatrixCols];
+
+	for (int i = 0; i < MatrixRows * MatrixCols; i++)
+	{
+		CopyM[i] = M[i];
+	}
+
+	return CopyM;
 }

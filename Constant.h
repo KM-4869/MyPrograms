@@ -11,6 +11,8 @@
 
 #define Deg2Rad(x) ((x)*Pi/180.0)
 #define Rad2Deg(x) ((x)*180.0/Pi)
+#define D2R (Pi/180.0)
+#define R2D (180.0/Pi)
 
 #define WGS84_a 6378137.0
 #define CGCS2000_a 6378137.0

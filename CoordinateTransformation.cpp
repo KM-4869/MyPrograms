@@ -1,8 +1,8 @@
 #include"Coordinate.h"
-#include"MyVector.h"
-#include"Constant.h"
+//#include"MyVector.h"
+
 #include<math.h>
-#include"Matrix.h"
+//#include"Matrix.h"
 
 int XYZ_to_BLH(XYZUNION* XyzUnion, BLH* Blh, const double a, const double e2)
 {
@@ -73,64 +73,64 @@ void BLH_to_XYZ(BLH *Blh,XYZUNION*XyzUnion,const double a,const double e2)
 
 }
 
-void StationXYZ_to_EarthXYZ(XYZUNION* StationXYZ, XYZUNION* StationPos, double a, double e2, XYZUNION* EarthXYZ)
-{
-	//如果测站在地心处，则地球坐标系与测站坐标系重合
-	if (fabs(StationPos->Xyz.X) < 1.0E-5 && fabs(StationPos->Xyz.Y) < 1.0E-5 && fabs(StationPos->Xyz.Z) < 1.0E-5)
-	{
-		*EarthXYZ = *StationXYZ;
-		return;
-	}
-
-	BLH blh;
-	XYZ_to_BLH(StationPos, &blh, a, e2);
-
-	//按y轴反向，y轴先转（90°-B），z轴转（180°-L）的顺序构造旋转矩阵C与反向矩阵Py
-	double Py[9];
-	double C[9];
-	double CPy[9];
-	double CPySXYZ[3];
-	CreateE(3, Py);
-	Py[4] = -Py[4];
-	RotateMatrix(0, Pi / 2 - Deg2Rad(blh.B), Pi - Deg2Rad(blh.L), 6, C);
-
-	MatrixMultiply(3, 3, 3, 3, C, Py, CPy);
-	MatrixMultiply(3, 3, 3, 1, CPy, StationXYZ->xyz, CPySXYZ);
-	MatrixAddition(3, 1, StationPos->xyz, CPySXYZ, EarthXYZ->xyz);
-}
-
-
-void EarthXYZ_to_StationXYZ(XYZUNION* EarthXYZ, XYZUNION* StationPos, double a, double e2, XYZUNION* StationXYZ)
-{
-
-	//如果测站在地心处，则地球坐标系与测站坐标系重合
-	if (fabs(StationPos->Xyz.X) < 1.0E-5 && fabs(StationPos->Xyz.Y) < 1.0E-5 && fabs(StationPos->Xyz.Z) < 1.0E-5)
-	{
-		*StationXYZ = *EarthXYZ;
-		return;
-	}
-
-	BLH blh;
-	XYZ_to_BLH(StationPos, &blh, a, e2);
-
-	//将上一函数的正交矩阵拿来求转置
-	double Py[9];
-	double C[9];
-	double CPy[9];
-	double CPyT[9];
-	double EXYZ_SPos[3];
-	CreateE(3, Py);
-	Py[4] = -Py[4];
-	RotateMatrix(0, Pi / 2 - Deg2Rad(blh.B), Pi - Deg2Rad(blh.L), 6, C);
-
-	MatrixMultiply(3, 3, 3, 3, C, Py, CPy);
-	MatrixT(3, 3, CPy, CPyT);
-
-	MatrixSubstraction(3, 1, EarthXYZ->xyz, StationPos->xyz, EXYZ_SPos);
-	MatrixMultiply(3, 3, 3, 1, CPyT, EXYZ_SPos, StationXYZ->xyz);
-
-
-}
+//void StationXYZ_to_EarthXYZ(XYZUNION* StationXYZ, XYZUNION* StationPos, double a, double e2, XYZUNION* EarthXYZ)
+//{
+//	//如果测站在地心处，则地球坐标系与测站坐标系重合
+//	if (fabs(StationPos->Xyz.X) < 1.0E-5 && fabs(StationPos->Xyz.Y) < 1.0E-5 && fabs(StationPos->Xyz.Z) < 1.0E-5)
+//	{
+//		*EarthXYZ = *StationXYZ;
+//		return;
+//	}
+//
+//	BLH blh;
+//	XYZ_to_BLH(StationPos, &blh, a, e2);
+//
+//	//按y轴反向，y轴先转（90°-B），z轴转（180°-L）的顺序构造旋转矩阵C与反向矩阵Py
+//	double Py[9];
+//	double C[9];
+//	double CPy[9];
+//	double CPySXYZ[3];
+//	CreateE(3, Py);
+//	Py[4] = -Py[4];
+//	RotateMatrix(0, Pi / 2 - Deg2Rad(blh.B), Pi - Deg2Rad(blh.L), 6, C);
+//
+//	MatrixMultiply(3, 3, 3, 3, C, Py, CPy);
+//	MatrixMultiply(3, 3, 3, 1, CPy, StationXYZ->xyz, CPySXYZ);
+//	MatrixAddition(3, 1, StationPos->xyz, CPySXYZ, EarthXYZ->xyz);
+//}
+//
+//
+//void EarthXYZ_to_StationXYZ(XYZUNION* EarthXYZ, XYZUNION* StationPos, double a, double e2, XYZUNION* StationXYZ)
+//{
+//
+//	//如果测站在地心处，则地球坐标系与测站坐标系重合
+//	if (fabs(StationPos->Xyz.X) < 1.0E-5 && fabs(StationPos->Xyz.Y) < 1.0E-5 && fabs(StationPos->Xyz.Z) < 1.0E-5)
+//	{
+//		*StationXYZ = *EarthXYZ;
+//		return;
+//	}
+//
+//	BLH blh;
+//	XYZ_to_BLH(StationPos, &blh, a, e2);
+//
+//	//将上一函数的正交矩阵拿来求转置
+//	double Py[9];
+//	double C[9];
+//	double CPy[9];
+//	double CPyT[9];
+//	double EXYZ_SPos[3];
+//	CreateE(3, Py);
+//	Py[4] = -Py[4];
+//	RotateMatrix(0, Pi / 2 - Deg2Rad(blh.B), Pi - Deg2Rad(blh.L), 6, C);
+//
+//	MatrixMultiply(3, 3, 3, 3, C, Py, CPy);
+//	MatrixT(3, 3, CPy, CPyT);
+//
+//	MatrixSubstraction(3, 1, EarthXYZ->xyz, StationPos->xyz, EXYZ_SPos);
+//	MatrixMultiply(3, 3, 3, 1, CPyT, EXYZ_SPos, StationXYZ->xyz);
+//
+//
+//}
 //子午圈半径,经度单位为度
 double RadiusOfMeridianCircle( double B, const double a, const double e2)
 {
@@ -161,3 +161,32 @@ void BLH_to_NE(const BLH& Station_BLH, const double a, const double e2, const BL
 	E = Deg2Rad(Blh.L - Station_BLH.L) * (RN + Blh.H) * cos(Deg2Rad(Blh.B));
 
 }
+
+Matrix DR_inv(BLH& Blh,const double a,const double e2)
+{
+	double RM = RadiusOfMeridianCircle(Blh.B, a, e2);
+	double RN = RadiusOfUnitaryCircle(Blh.B, a, e2);
+
+	Matrix DR_inv(3, 3);
+
+	DR_inv.assign(1, 1, 1.0 / (RM + Blh.H));
+	DR_inv.assign(2, 2, 1.0 / ((RN + Blh.H) * cos(Deg2Rad(Blh.B))));
+	DR_inv.assign(3, 3, -1.0);
+
+	return DR_inv;
+}
+
+Matrix DR(BLH& Blh, const double a, const double e2)
+{
+	double RM = RadiusOfMeridianCircle(Blh.B, a, e2);
+	double RN = RadiusOfUnitaryCircle(Blh.B, a, e2);
+
+	Matrix DR(3, 3);
+
+	DR.assign(1, 1, RM + Blh.H);
+	DR.assign(2, 2, (RN + Blh.H) * cos(Deg2Rad(Blh.B)));
+	DR.assign(3, 3, -1.0);
+
+	return DR;
+}
+

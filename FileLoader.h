@@ -28,8 +28,7 @@ public:
 
 
 
-private:
-
+protected:
 
 	fstream fin;
 	int DataCount;

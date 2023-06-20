@@ -2,9 +2,6 @@
 #include"LooseCombination.h"
 
 
-
-
-
 //构造函数。首先调用父类的构造函数。ImuNoise 和杆臂 antlever直接在列表中实现传值。
 Body::Body(NavState inistate, NavState inistate_std, IMUNoise imun, Vector al,Vector ol):IMUBOX(inistate.Blh,inistate.Vel,inistate.Angle),ImuNoise(imun),antlever(al),odolever(ol),Cov(21,21),q(18,18),x(21,1)
 {
@@ -64,7 +61,7 @@ Body::Body(NavState inistate, NavState inistate_std, IMUNoise imun, Vector al,Ve
 	//Cov = 2 * Cov;
 
 }
-
+//添加imu数据所需具有的格式：第一列为GPS周秒，2-4列为陀螺仪输出(rad),5-7列为加速度计输出(m/s)，共7列
 void Body::AddIMUData(double* OneLineIMU)
 {
 	IMUData_pre = IMUData_cur;
@@ -74,7 +71,7 @@ void Body::AddIMUData(double* OneLineIMU)
 
 	Compensate();
 }
-
+//添加GNSS数据所需具有的格式：第一列GPS周秒，2-4列经纬高(deg,m),5-7列经纬高方差，8-10列北东地速度(m/s),11-13列北东地速度方差，共13列
 void Body::AddGNSSData(double* OneLineGNSS)
 {
 	GNSSData.time = OneLineGNSS[0];
@@ -119,6 +116,11 @@ void Body::ImuInterpolate(IMUDATA& IMUData_pre, IMUDATA& IMUData_cur, double mid
 void Body::SetTimestamp(double time)
 {
 	timestamp = time;
+}
+
+void Body::PureINSwork()
+{
+	PureINSmech(IMUData_pre, IMUData_cur);
 }
 
 void Body::ImuPropagation(IMUDATA& IMUData_pre, IMUDATA& IMUData_cur)
@@ -233,6 +235,7 @@ void Body::ImuPropagation(IMUDATA& IMUData_pre, IMUDATA& IMUData_cur)
 	//x = Phi * x;
 	Cov = Phi * Cov * Phi.T() + Q;
 }
+
 
 void Body::GNSSUpdating(IMUDATA& IMUData_mid)
 {
@@ -670,7 +673,7 @@ void Body::BodyOutputToFile(fstream& fout)
 	fout << setw(4) << "VD:" << setw(14) << Vel.getelement(3, 1);
 	fout << setw(6) << "roll:" << setw(14) << Angle.roll;
 	fout << setw(8) << "pitch:" << setw(14) << Angle.pitch;
-	fout << setw(6) << "yaw:" << setw(14) << Angle.yaw << endl;
+	fout << setw(7) << "yaw:" << setw(16) << Angle.yaw << endl;
 }
 void Body::CovOutputToFile(fstream& fout)
 {

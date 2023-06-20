@@ -4,6 +4,7 @@
 #include"Constant.h"
 #include<iomanip>//设置输出格式
 #include<fstream>
+
 using namespace std;
 struct NavState
 {
@@ -25,7 +26,7 @@ struct GNSSDATA
 	double time;
 
 	Vector Blh;
-	Vector Vel;
+	Vector Vel;//北东地
 
 	Vector Blh_std;
 	Vector Vel_std;
@@ -48,13 +49,15 @@ public:
 
 	Body(NavState inistate, NavState inistate_std, IMUNoise imun, Vector al, Vector ol);
 
-	void AddIMUData(double* OneLineIMU);
-	void AddGNSSData(double* OneLineGNSS);
+	
+	void AddIMUData(double* OneLineIMU);//添加imu数据所需具有的格式：第一列为GPS周秒，2-4列为陀螺仪输出(rad),5-7列为加速度计输出(m/s),共7列
+	void AddGNSSData(double* OneLineGNSS);//添加GNSS数据所需具有的格式：第一列GPS周秒，2-4列经纬高(deg,m),5-7列经纬高方差，8-10列北东地速度(m/s),11-13列北东地速度方差，共13列
 	void AddODOData(double* OneLineODO);
 
 	void SetTimestamp(double time);
 	bool IsGNSSDataAvailable();
 
+	void PureINSwork();
 	void work();
 	
 

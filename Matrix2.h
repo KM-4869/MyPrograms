@@ -1,5 +1,7 @@
 #pragma once
-#include<stdarg.h>
+#include<stdarg.h>//多参数函数
+#include<random>//随机数库
+#include<ctime>
 class Vector;
 class Matrix
 {
@@ -23,6 +25,9 @@ public:
 	Matrix operator*(const Matrix& m)const;//矩阵乘法
 	Matrix operator,(const Matrix& m)const;//两个矩阵进行左右合并
 	Matrix operator&(const Matrix& m)const;//两个矩阵进行上下合并
+	void MulT(int row, double c);//矩阵初等行变换——倍乘变换
+	void AddT(int irow, double c, int jrow);//矩阵初等行变换——倍加变换
+	void ExChangeT(int irow, int jrow);//矩阵初等行变换——对换变换
 	Matrix SubMatrix(int topleft_row, int topleft_col, int submatrixrow, int submatrixcol)const;//取子矩阵
 	friend Matrix operator*(const double C,const Matrix&m);//矩阵数乘
 	friend Matrix operator*(const Matrix& m, const double C);//矩阵数乘
@@ -30,13 +35,16 @@ public:
 	double det()const;//求行列式
 	Matrix A()const;//伴随矩阵
 	Matrix inv()const;//矩阵求逆
+	Matrix inv2()const;//矩阵求逆（使用矩阵初等行变换化为单位阵的方式，更快的求逆）
 	void ToE(int n);//将矩阵变为n维单位阵
 	void ToZero();//把一个矩阵全部清零
+	void RandomMatrix(double min, double max);//使用范围从min到max的平均分布的随机实数填充矩阵
 	void Show()const;
 
 	int getrow()const;
 	int getcol()const;
 	int getsize()const;
+	double* getdata()const;//获得一个指向与矩阵内部元素相同的数组的指针（需要手动释放，是矩阵的复制，不会改变原矩阵）
 	double getelement(int row,int col)const;
 
 

@@ -1,10 +1,12 @@
 #pragma once
-
+#include"Constant.h"
+#include"Matrix2.h"
 struct XYZ 
 {
 	double X;
 	double Y;
 	double Z;
+
 };
 union XYZUNION
 {
@@ -24,11 +26,13 @@ struct BLH
 	double B;
 	double L;
 	double H;
-	BLH()
+
+	
+	BLH(double b=0.0,double l=0.0,double h=0.0)
 	{
-		B = 0.0;
-		L = 0.0;
-		H = 0.0;
+		B = b;
+		L = l;
+		H = h;
 	}
 };
 
@@ -41,3 +45,5 @@ double RadiusOfMeridianCircle(const double B, const double a, const double e2);
 double RadiusOfUnitaryCircle(const double B, const double a, const double e2);
 double gravity(double B, double H);
 void BLH_to_NE(const BLH& Station_BLH, const double a, const double e2, const BLH& Blh, double& N, double& E);
+Matrix DR_inv(BLH& Blh, const double a, const double e2);
+Matrix DR(BLH& Blh, const double a, const double e2);
